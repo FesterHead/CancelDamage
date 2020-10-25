@@ -1,0 +1,8 @@
+main: com.festerhead.CancelDamage
+name: CancelDamage
+version: "%PLUGIN_VERSION%"
+description: "This plugin cancels non-player damage."
+authors: [FesterHead]
+prefix: CancelDamage
+api-version: "1.13"
+api: "1.13"

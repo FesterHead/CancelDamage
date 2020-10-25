@@ -1,29 +1,3 @@
-# Cancel Damage
-
-Mostly made this to nerf fall damage mob farms on my SkyBlock server.
-
-## Minecraft version
-The following Minecraft versions are available in the release downloads:
-- 1.15.2 (default, this is the version I use)
-- 1.16.3
-
-## Support
-- None
-
-## Issue Tracker
-- https://github.com/FesterHead/CancelDamage/issues
-
-## Discord
-- None
-
-## Configuration Assistance
-- None
-
-## Contributing To CancelDamage
-- Fork the repository and issue a pull request.
-
-Default configuration:
-```
 #
 # This plugin cancels non-player damage.
 # Use damage causes from bukkit:  https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
@@ -48,35 +22,10 @@ Default configuration:
 
 damage-cause:
   default:
-    enabled: false          # All damage causes not listed will process normally.
+    enabled: false
     percent-chance: "100"
     percent-damage: "100"
 #  fall:
-#    enabled: true           # Cancel all non-player fall damage
+#    enabled: true
 #    percent-chance: "100"
 #    percent-damage: "100"
-```
-
-Example:
-```
-  fall:
-    enabled: true           # 50% of the time, reduce fall damage by 25%
-    percent-chance: "50"
-    percent-damage: "25"
-```
-
-Example:
-```
-  fall:
-    enabled: true           # Randomly reduce fall damage by 90%
-    percent-chance: "rnd"
-    percent-damage: "90"
-```
-
-Example:
-```
-  fall:
-    enabled: true           # Randomly reduce fall damage by a random percent
-    percent-chance: "rnd"
-    percent-damage: "rnd"
-```
