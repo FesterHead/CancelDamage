@@ -1,9 +1,11 @@
 package com.festerhead.listener;
 
 import java.util.Objects;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.festerhead.CancelDamage;
 import com.festerhead.object.ConfigCause;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,15 +37,25 @@ public class EntityDamage implements Listener {
       cause = plugin.getDefaultCause();
     }
 
+    plugin.logMessage(1, "Is " + event.getEntityType() + " " + event.getCause() + " enabled? " + cause.isEnabled());
+
     // Check if the damage cause is enabled for cancelling
     if (Objects.nonNull(cause) && cause.isEnabled()) {
       // Is this a complete cancel?
-      if (cause.getPercentChance() >= new Random().nextInt(100)) {
+      int percentChance = cause.getPercentChance();
+      int rnd = ThreadLocalRandom.current().nextInt(0, 101);
+      plugin.logMessage(2,
+          "   " + "Cancel calculation = %-chance:" + percentChance + " >= rnd:" + rnd + " ? " + (percentChance >= rnd));
+      if (percentChance >= rnd) {
+        plugin.logMessage(2, "   " + event.getEntityType() + " " + event.getCause() + " damage is cancelled!");
         event.setCancelled(true);
       } else {
         // Compute and apply damage reduction
-        double newDamage = event.getDamage() - (event.getDamage() * (cause.getPercentDamage() / 100.0));
-        event.setDamage(((newDamage < 0.0 || newDamage > event.getDamage() ? event.getDamage() : newDamage)));
+        int percentCancel = cause.getPercentCancel();
+        double newDamage = ((double) ((100 - percentCancel) / 100.0)) * event.getDamage();
+        plugin.logMessage(2, "   " + "Incoming damage: " + event.getDamage() + " %-cancel:" + percentCancel
+            + " new damage:" + newDamage);
+        event.setDamage(newDamage);
       }
     }
   }

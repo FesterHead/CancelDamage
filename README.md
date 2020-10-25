@@ -22,17 +22,13 @@ The following Minecraft versions are available in the release downloads:
 ## Contributing To CancelDamage
 - Fork the repository and issue a pull request.
 
-Default configuration:
+## Default configuration:
 ```
-#
-# This plugin cancels non-player damage.
+# This plugin cancels non-player caused damage.
 # Use damage causes from bukkit:  https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
 # Case is insensitive.
-#
 # If a damage cause is not configured the defaults will apply.
-#
 # For each damage type:
-#
 #         enabled: Is this damage type enabled?
 #                  False means a damage type is processed normally and skipped from this plugin.
 #                  If false, the other parameters are not needed.
@@ -40,43 +36,33 @@ Default configuration:
 #  percent-chance: Percent chance the damage will be cancelled.
 #                  Default is "100".  Meaning damage will be cancelled 100% of the time.
 #                  Misconfiguration will use the default value.
-#                  Use "rnd" for a random chance from 0 to 100 determined on each damage event.
-#  percent-damage: Percent of the damage to be cancelled, provided the damage is to be cancelled.
-#                  Default is "100".  Meaning 100% of the dame will be cancelled.
+#                  Use "rnd:min:max" for a random chance from min to max determined on each damage event. Use rnd:0:100 for 0 to 100
+#  percent-cancel: Percent of the damage to cancel, provided the damage is not already cancelled.
+#                  Default is "100".  Meaning 100% of the damage will be cancelled.
 #                  Misconfiguration will use the default value.
-#                  Use "rnd" for a random percentage from 0 to 100 determined on each damage event.
-
+#                  Use "rnd:min:max" for a random chance from min to max determined on each damage event. Use rnd:0:100 for 0 to 100
+# log-level: 0 = only startup/reload messages, 1 = include enabled damage cause messages, 2 = include all damage cause messages and calculations
 damage-cause:
   default:
-    enabled: false          # All damage causes not listed will process normally.
-    percent-chance: "100"
-    percent-damage: "100"
-#  fall:
-#    enabled: true           # Cancel all non-player fall damage
-#    percent-chance: "100"
-#    percent-damage: "100"
+    enabled: false
+    percent-chance: 100
+    percent-cancel: 100
+  fall:
+    enabled: false
+    percent-chance: 50
+    percent-cancel: rnd:80:100
+log-level: 0
 ```
 
-Example:
-```
-  fall:
-    enabled: true           # 50% of the time, reduce fall damage by 25%
-    percent-chance: "50"
-    percent-damage: "25"
-```
+## What does cancel mean?
+Let's say the damage to be applied to an entity is 100.  If the percent to cancel is 75%, then 25 is set for the damage.
 
-Example:
-```
-  fall:
-    enabled: true           # Randomly reduce fall damage by 90%
-    percent-chance: "rnd"
-    percent-damage: "90"
-```
+`(100 - percent to cancel) / 100 * incoming damage = new damage`
 
-Example:
-```
-  fall:
-    enabled: true           # Randomly reduce fall damage by a random percent
-    percent-chance: "rnd"
-    percent-damage: "rnd"
-```
+Examples:
+|incoming damage|percent to cancel|calculation|new damage|
+|:---:|:---:|:---:|:---:|
+|100|75|(100-75)/100*100|25|
+|45|40|(100-40)/100*45|27|
+|36|90|(100-90)/100*36|3.6|
+|21|12|(100-12)/100*21|18.48|

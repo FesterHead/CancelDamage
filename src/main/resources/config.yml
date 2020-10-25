@@ -1,12 +1,8 @@
-#
-# This plugin cancels non-player damage.
+# This plugin cancels non-player caused damage.
 # Use damage causes from bukkit:  https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
 # Case is insensitive.
-#
 # If a damage cause is not configured the defaults will apply.
-#
 # For each damage type:
-#
 #         enabled: Is this damage type enabled?
 #                  False means a damage type is processed normally and skipped from this plugin.
 #                  If false, the other parameters are not needed.
@@ -14,18 +10,19 @@
 #  percent-chance: Percent chance the damage will be cancelled.
 #                  Default is "100".  Meaning damage will be cancelled 100% of the time.
 #                  Misconfiguration will use the default value.
-#                  Use "rnd" for a random chance from 0 to 100 determined on each damage event.
-#  percent-damage: Percent of the damage to be cancelled, provided the damage is to be cancelled.
-#                  Default is "100".  Meaning 100% of the dame will be cancelled.
+#                  Use "rnd:min:max" for a random chance from min to max determined on each damage event. Use rnd:0:100 for 0 to 100
+#  percent-cancel: Percent of the damage to cancel, provided the damage is not already cancelled.
+#                  Default is "100".  Meaning 100% of the damage will be cancelled.
 #                  Misconfiguration will use the default value.
-#                  Use "rnd" for a random percentage from 0 to 100 determined on each damage event.
-
+#                  Use "rnd:min:max" for a random chance from min to max determined on each damage event. Use rnd:0:100 for 0 to 100
+# log-level: 0 = only startup/reload messages, 1 = include enabled damage cause messages, 2 = include all damage cause messages and calculations
 damage-cause:
   default:
     enabled: false
-    percent-chance: "100"
-    percent-damage: "100"
-#  fall:
-#    enabled: true
-#    percent-chance: "100"
-#    percent-damage: "100"
+    percent-chance: 100
+    percent-cancel: 100
+  fall:
+    enabled: false
+    percent-chance: 50
+    percent-cancel: rnd:80:100
+log-level: 0

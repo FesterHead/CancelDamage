@@ -2,6 +2,9 @@ package com.festerhead;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.festerhead.command.CommandManager;
+import com.festerhead.command.Completer;
 import com.festerhead.listener.EntityDamage;
 import com.festerhead.object.ConfigCause;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,6 +15,7 @@ public class CancelDamage extends JavaPlugin {
 
   FileConfiguration config;
   ConfigCause defaultCause;
+  int logLevel;
   private final Map<DamageCause, ConfigCause> causes = new HashMap<>();
 
   public Map<DamageCause, ConfigCause> getCauses() {
@@ -22,10 +26,18 @@ public class CancelDamage extends JavaPlugin {
     return defaultCause;
   }
 
+  public void logMessage(int level, String message) {
+    if (logLevel >= level) {
+      getLogger().info(message);
+    }
+  }
+
   @Override
   public void onEnable() {
     reloadConfig();
     getServer().getPluginManager().registerEvents(new EntityDamage(this), this);
+    getCommand("canceldamage").setExecutor(new CommandManager(this));
+    getCommand("canceldamage").setTabCompleter(new Completer());
   }
 
   @Override
@@ -39,41 +51,53 @@ public class CancelDamage extends JavaPlugin {
     config = getConfig();
     config.options().copyDefaults(true);
     saveConfig();
-    if (!config.isConfigurationSection("damage-cause")) {
-      getLogger().severe("Configuration error: damage-cause not found.");
-      getLogger().severe("All damage causes will follow defaults.");
-    } else {
-      boolean defaultFound = false;
-      for (String damageCause : config.getConfigurationSection("damage-cause").getKeys(false)) {
-        boolean enabled = config.getBoolean("damage-cause." + damageCause + ".enabled", true);
-        String percentChance = config.getString("damage-cause." + damageCause + ".percent-chance", "100");
-        String percentDamage = config.getString("damage-cause." + damageCause + ".percent-damage", "100");
-        double costPerDamage = config.getDouble("damage-cause." + damageCause + ".cost-per-damage", 0.0);
-        if (damageCause.toUpperCase().equals("DEFAULT")) {
-          setupDefaults(enabled, percentChance, percentDamage, costPerDamage);
-          defaultFound = true;
-        } else {
-          try {
-            DamageCause key = DamageCause.valueOf(damageCause.toUpperCase());
-            causes.put(key, new ConfigCause(enabled, percentChance, percentDamage, costPerDamage));
-            getLogger().info("Registered " + key.toString() + " damage cause.");
-          } catch (IllegalArgumentException exception) {
-            getLogger().severe(damageCause.toUpperCase() + " is not a valid DamageCause and will be skipped.");
+
+    getLogger().info("Loading configuration...");
+    logLevel = config.getInt("log-level", 0);
+    if (logLevel < 0 || logLevel > 2) {
+      logLevel = 0;
+    }
+    getLogger().info("log-level: " + logLevel + (logLevel == 2 ? " - expect plenty console spam!"
+        : (logLevel == 1 ? " - expect moderate console spam!" : "")));
+    causes.clear();
+    boolean defaultFound = false;
+    for (String damageCause : config.getConfigurationSection("damage-cause").getKeys(false)) {
+      boolean enabled = config.getBoolean("damage-cause." + damageCause + ".enabled", false);
+      String percentChance = config.getString("damage-cause." + damageCause + ".percent-chance", "100");
+      String percentCancel = config.getString("damage-cause." + damageCause + ".percent-cancel", "100");
+      if (damageCause.equalsIgnoreCase("DEFAULT")) {
+        setupDefaults(enabled, percentChance, percentCancel);
+        defaultFound = true;
+      } else {
+        try {
+          DamageCause key = DamageCause.valueOf(damageCause.toUpperCase());
+          causes.put(key, new ConfigCause(enabled, percentChance, percentCancel));
+          getLogger().info(key.toString() + " damage is " + (enabled ? "" : "not ") + "enabled and will be "
+              + (enabled ? "processed." : "skipped."));
+          if (enabled) {
+            getLogger().info(" percent-chance: " + percentChance);
+            getLogger().info(" percent-cancel: " + percentCancel);
           }
+        } catch (IllegalArgumentException exception) {
+          getLogger().severe(
+              damageCause.toUpperCase() + " is not a valid entity.EntityDamageEvent.DamageCause and will be skipped.");
         }
       }
-      if (!defaultFound) {
-        setupDefaults(false, "100", "100", 0.0);
-      }
+    }
+    if (!defaultFound) {
+      setupDefaults(false, "100", "100");
+    }
+    getLogger().info("Configuration loaded.");
+  }
+
+  private void setupDefaults(boolean enabled, String percentChance, String percentCancel) {
+    defaultCause = new ConfigCause(enabled, percentChance, percentCancel);
+    getLogger().info("Default damage is " + (enabled ? "" : "not ")
+        + "enabled and all specific damage causes not listed will be " + (enabled ? "processed" : "skipped") + ".");
+    if (enabled) {
+      getLogger().info(" percent-chance: " + percentChance);
+      getLogger().info(" percent-cancel: " + percentCancel);
     }
   }
 
-  private void setupDefaults(boolean enabled, String percentChance, String percentDamage, double costPerDamage) {
-    defaultCause = new ConfigCause(enabled, percentChance, percentDamage, costPerDamage);
-    getLogger().info("Registered defaults:");
-    getLogger().info("        enabled: " + enabled);
-    getLogger().info(" percent-chance: " + percentChance);
-    getLogger().info(" percent-damage: " + percentDamage);
-    getLogger().info("cost-per-damage: " + costPerDamage);
-  }
 }

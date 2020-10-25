@@ -5,6 +5,13 @@
 		}
 	],
 	"settings": {
-		"java.configuration.updateBuildConfiguration": "automatic"
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"editor.tabSize": 2,
+		"yaml.format.printWidth": 240,
+		"yaml.format.proseWrap": "never",
+		"editor.detectIndentation": false,
+		"editor.wordWrapColumn": 240,
+		"html.format.wrapLineLength": 0,
+		"editor.wordWrap": "wordWrapColumn"
 	}
 }

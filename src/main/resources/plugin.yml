@@ -6,3 +6,12 @@ authors: [FesterHead]
 prefix: CancelDamage
 api-version: "1.13"
 api: "1.13"
+commands:
+  canceldamage:
+    description: CancelDamage command
+    usage: /canceldamage
+    permission: canceldamage.admin
+permissions:
+  canceldamage.admin:
+    description: Permission for the CancelDamage command
+    default: op

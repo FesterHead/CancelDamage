@@ -1,18 +1,16 @@
 package com.festerhead.object;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ConfigCause {
   private boolean enabled;
   private String percentChance;
-  private String percentDamage;
-  private double costPerDamage;
+  private String percentCancel;
 
-  public ConfigCause(boolean enabled, String percentChance, String percentDamage, double costPerDamage) {
+  public ConfigCause(boolean enabled, String percentChance, String percentCancel) {
     this.enabled = enabled;
     this.percentChance = percentChance;
-    this.percentDamage = percentDamage;
-    this.costPerDamage = costPerDamage;
+    this.percentCancel = percentCancel;
   }
 
   public boolean isEnabled() {
@@ -31,31 +29,39 @@ public class ConfigCause {
     this.percentChance = percentChance;
   }
 
-  public int getPercentDamage() {
-    return convertInput(percentDamage);
+  public int getPercentCancel() {
+    return convertInput(percentCancel);
   }
 
-  public void setPercentDamage(String percentDamage) {
-    this.percentDamage = percentDamage;
-  }
-
-  public double getCostPerDamage() {
-    return costPerDamage;
-  }
-
-  public void setCostPerDamage(double costPerDamage) {
-    this.costPerDamage = costPerDamage;
+  public void setPercentCancel(String percentCancel) {
+    this.percentCancel = percentCancel;
   }
 
   private int convertInput(String input) {
     int returnValue = 100;
-    if (input.toUpperCase().equals("RND")) {
-      returnValue = new Random().nextInt(100);
-    }
-    try {
-      returnValue = Integer.parseInt(input);
-    } catch (NumberFormatException exception) {
-      returnValue = 100;
+    if (input.toUpperCase().startsWith("RND")) {
+      String[] colonArray = input.split(":");
+      int min = 0;
+      int max = 100;
+      if (colonArray.length == 3) {
+        try {
+          min = Integer.parseInt(colonArray[1]);
+        } catch (NumberFormatException exception) {
+          min = 0;
+        }
+        try {
+          max = Integer.parseInt(colonArray[2]);
+        } catch (NumberFormatException exception) {
+          max = 100;
+        }
+      }
+      returnValue = ThreadLocalRandom.current().nextInt(min, max + 1);
+    } else {
+      try {
+        returnValue = Integer.parseInt(input);
+      } catch (NumberFormatException exception) {
+        returnValue = 100;
+      }
     }
     return ((returnValue < 0) || (returnValue > 100) ? 100 : returnValue);
   }
