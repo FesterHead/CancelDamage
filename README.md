@@ -32,7 +32,7 @@ The following Minecraft versions are available in the release downloads:
 #         enabled: Is this damage type enabled?
 #                  False means a damage type is processed normally and skipped from this plugin.
 #                  If false, the other parameters are not needed.
-#                  Default is 'true'
+#                  Default is 'false'
 #  percent-chance: Percent chance the damage will be cancelled.
 #                  Default is "100".  Meaning damage will be cancelled 100% of the time.
 #                  Misconfiguration will use the default value.
